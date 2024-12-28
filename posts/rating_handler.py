@@ -12,6 +12,7 @@ POST_RATE_CACHE_KEY_FORMAT = "post_rate:{}"
 
 logger = logging.getLogger(__name__)
 
+# can use another redis instance for rate limiting to not affect the application default redis performance
 rate_limiter = RateLimiter(redis_client.client, prefix="post_rating_rate_limiter")
 
 
