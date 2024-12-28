@@ -5,11 +5,14 @@ from rest_framework.utils import json
 
 from posts.models import PostRate, Post
 from posts.tasks import calculate_new_rate_task
+from rate_limiter.handler import RateLimiter
 from utils import redis_client
 
 POST_RATE_CACHE_KEY_FORMAT = "post_rate:{}"
 
 logger = logging.getLogger(__name__)
+
+rate_limiter = RateLimiter(redis_client.client, prefix="post_rating_rate_limiter")
 
 
 def get_post_rate_cache_key(post_id):
@@ -23,6 +26,8 @@ def set_post_ratings_into_cache(mapping):
     redis_client.client.mset(cache_mapping)
 
 
+@rate_limiter.limit(limit_args=["user_id"], max_limit=5, bucket_increase_rate=0)
+@rate_limiter.limit(limit_args=["post_id"], min_limit=10, bucket_increase_rate=0.5)
 def submit_rate(post_id, user_id, rate):
     old_rate = (
         PostRate.objects.filter(post_id=post_id, user_id=user_id)
@@ -80,7 +85,7 @@ def get_user_post_rates(post_ids, user_id):
 
 def calculate_new_post_rate(post_id, old_rate, new_rate):
     with redis_client.client.lock(
-        f"posts_rating_lock_{post_id}", blocking_timeout=3, timeout=3
+            f"posts_rating_lock_{post_id}", blocking_timeout=3, timeout=3
     ):
         rate, rate_count = get_post_rating_data(post_id)
         total_rate = rate * rate_count
