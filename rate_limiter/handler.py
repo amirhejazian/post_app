@@ -1,9 +1,12 @@
 import functools
+import logging
 import math
 import time
 from datetime import datetime
 
 from rate_limiter.exceptions import RateLimitExceededException
+
+logger = logging.getLogger(__name__)
 
 
 class RateLimiter:
@@ -59,11 +62,16 @@ class RateLimiter:
         def limiter(func):
             @functools.wraps(func)
             def inner(*args, **kwargs):
-                to_limit_args = [str(kwargs.get(k)) for k in limit_args]
-                key = f"{func.__name__}:{"".join(to_limit_args)}"
-                if self.is_limited(key, min_limit, max_limit, bucket_increase_rate):
-                    raise RateLimitExceededException("Rate limit exceeded for method {}".format(func.__name__))
-                self.increment(key)
+                try:
+                    to_limit_args = [str(kwargs.get(k)) for k in limit_args]
+                    key = f"{func.__name__}:{"".join(to_limit_args)}"
+                    if self.is_limited(key, min_limit, max_limit, bucket_increase_rate):
+                        raise RateLimitExceededException("Rate limit exceeded for method {}".format(func.__name__))
+                    self.increment(key)
+                except RateLimitExceededException:
+                    raise
+                except Exception as e:
+                    logging.exception(e)
                 return func(*args, **kwargs)
 
             return inner
