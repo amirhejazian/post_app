@@ -51,22 +51,24 @@ class RateLimiter:
 
     def is_limited(self, key, min_limit=1000, max_limit=None, bucket_increase_rate=0.3):
         limit = self.get_count(key, time.time() - 3600) * (1 + bucket_increase_rate)
-        print(limit)
         limit = max(limit, min_limit)
         if max_limit is not None:
             limit = min(limit, max_limit)
-        print(limit, self.get_count(key))
         return limit <= self.get_count(key)
 
-    def limit(self, limit_args, min_limit=1000, max_limit=None, bucket_increase_rate=0.3):
+    def limit(
+            self, limit_args, min_limit=1000, max_limit=None, bucket_increase_rate=0.3
+    ):
         def limiter(func):
             @functools.wraps(func)
             def inner(*args, **kwargs):
                 try:
                     to_limit_args = [str(kwargs.get(k)) for k in limit_args]
-                    key = f"{func.__name__}:{"".join(to_limit_args)}"
+                    key = f"{func.__name__}:" + "".join(to_limit_args)
                     if self.is_limited(key, min_limit, max_limit, bucket_increase_rate):
-                        raise RateLimitExceededException("Rate limit exceeded for method {}".format(func.__name__))
+                        raise RateLimitExceededException(
+                            "Rate limit exceeded for method {}".format(func.__name__)
+                        )
                     self.increment(key)
                 except RateLimitExceededException:
                     raise

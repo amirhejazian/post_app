@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-3b8c31pz70n&zm1si3vqgh4&m4ix20c-mt&aej(t=e!^n6p3ha"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
     "django_extensions",
     "posts",
 ]
@@ -139,4 +140,3 @@ POST_CACHE_TTL = config("POST_CACHE_TTL", default=60 * 60 * 24, cast=int)
 
 # CELERY config
 CELERY_BROKER_URL = config("CELERY_BROKER_URL")
-# print(CELERY_BROKER_URL)

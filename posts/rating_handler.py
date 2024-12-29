@@ -86,7 +86,7 @@ def get_user_post_rates(post_ids, user_id):
 
 def calculate_new_post_rate(post_id, old_rate, new_rate):
     with redis_client.client.lock(
-            f"posts_rating_lock_{post_id}", blocking_timeout=3, timeout=3
+        f"posts_rating_lock_{post_id}", blocking_timeout=3, timeout=3
     ):
         rate, rate_count = get_post_rating_data(post_id)
         total_rate = rate * rate_count
