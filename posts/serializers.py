@@ -5,6 +5,7 @@ from posts.models import Post
 
 
 class PostSerializer(serializers.Serializer):
+    id = serializers.SerializerMethodField(method_name="get_id")
     title = serializers.SerializerMethodField(method_name="get_title")
     text = serializers.SerializerMethodField(method_name="get_text")
     rate = serializers.SerializerMethodField(method_name="get_rate")
@@ -20,6 +21,9 @@ class PostSerializer(serializers.Serializer):
         self.user_rates = None
         if user_id := kwargs["context"]["request"].user_id:
             self.user_rates = rating_handler.get_user_post_rates(post_ids, user_id)
+
+    def get_id(self, obj):
+        return obj.id
 
     def get_title(self, obj):
         return self.posts_data[obj.id]["title"]

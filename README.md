@@ -94,6 +94,7 @@ curl --location 'http://127.0.0.1:8000/posts' \
   "previous": null,
   "results": [
     {
+      "id": 25,
       "title": "First Title",
       "text": "First post text",
       "rate": 2.8,
@@ -101,6 +102,7 @@ curl --location 'http://127.0.0.1:8000/posts' \
       "user_rate": null
     },
     {
+      "id": 24,
       "title": "rg7fbrtu",
       "text": "ghyhubjjjjjjj,dndbvcxbghnjkjxhcgvfbnmdxkjuhyuidfktmjnmjfchghjnmfvg mhykjgbfvchbft",
       "rate": 3.4,
