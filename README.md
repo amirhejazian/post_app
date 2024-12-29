@@ -63,7 +63,15 @@ For handling abnormal user behaviors, a rate-limiting mechanism is developed, wh
     - Rate limiting
 - **PostgreSQL** is chosen as the SQL database.
 
----
+## Setup the service:
+
+1.Make sure you have docker installed
+
+2.Run
+
+```bash
+ ./start.sh
+ ```
 
 ## Endpoints:
 
